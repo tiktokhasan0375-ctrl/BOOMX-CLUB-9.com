@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BOOMX CLUB | Official</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FFD700;
+            --secondary: #B8860B;
+            --accent: #fbbf24;
+            --success: #10b981;
+            --danger: #ef4444;
+            --dark-bg: #0f172a;
+            --glass: rgba(255, 255, 255, 0.1);
+            --card-bg: #000000;
+        }
+
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+        body { background-color: var(--dark-bg); min-height: 100vh; overflow-x: hidden; color: #333; }
+
+        .app-shell { width: 100%; max-width: 430px; background: #000000; min-height: 100vh; position: relative; margin: 0 auto; box-shadow: 0 0 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+
+        /* Auth Section */
+        .auth-header { background: linear-gradient(135deg, var(--secondary), var(--primary)); padding: 40px 20px; color: white; border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .brand-logo { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+        .brand-logo span { color: var(--accent); }
+
+        .tab-box { display: flex; margin: -25px 30px 20px; background: white; padding: 6px; border-radius: 20px; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .auth-tab { flex: 1; text-align: center; padding: 12px; font-weight: 700; color: #94a3b8; border-radius: 15px; cursor: pointer; transition: 0.3s; }
+        .auth-tab.active { background: var(--primary); color: white; }
+
+        /* Professional Category Tabs */
+        .cat-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 10px 15px; scrollbar-width: none; }
+        .cat-scroll::-webkit-scrollbar { display: none; }
+        .cat-btn { background: white; padding: 10px 20px; border-radius: 12px; font-size: 12px; font-weight: 700; color: #64748b; white-space: nowrap; border: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 75px; transition: 0.3s; }
+        .cat-btn.active { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
+        .cat-btn i { font-size: 18px; }
+
+        .input-group { margin: 0 25px 18px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: #475569; }
+        .input-wrapper { display: flex; align-items: center; background: white; border: 2px solid #e2e8f0; border-radius: 15px; padding: 0 15px; transition: 0.3s; }
+        .input-wrapper:focus-within { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        .input-wrapper input { width: 100%; padding: 14px 0; border: none; outline: none; font-size: 15px; margin-left: 10px; background: transparent; }
+
+        .btn-main { background: linear-gradient(to right, var(--primary), var(--secondary)); color: white; border: none; padding: 16px; border-radius: 15px; font-weight: 700; width: calc(100% - 50px); margin: 10px 25px; cursor: pointer; transform: translateY(0); transition: 0.2s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .btn-main:active { transform: translateY(2px); }
+
+        /* Dashboard Components */
+        .top-bar { background: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid #e2e8f0; }
+        
+        .slider-container { padding: 15px; }
+        .hero-banner { height: 170px; width: 100%; background-size: cover; background-repeat: no-repeat; background-position: center; border-radius: 20px; position: relative; overflow: hidden; transition: background-image 0.6s ease-in-out; background-color: #ddd; box-shadow: 0 8px 20px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2); }
+        .slider-dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
+        .dot { width: 8px; height: 8px; background: #cbd5e1; border-radius: 50%; transition: 0.3s; }
+        .dot.active { width: 22px; background: var(--primary); border-radius: 10px; }
+
+        .notice-bar { margin: 0 15px 15px; background: white; padding: 10px 15px; border-radius: 12px; display: flex; align-items: center; gap: 10px; border-left: 4px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+
+        /* Game Grid Styling */
+        .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px 15px; }
+        .game-btn { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid #fff; cursor: pointer; position: relative; }
+        .game-btn:active { transform: scale(0.95); }
+        .game-btn img { width: 100%; height: 100px; object-fit: cover; display: block; }
+        .game-btn p { font-size: 10px; font-weight: 800; padding: 6px 2px; text-align: center; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .game-tag { position: absolute; top: 5px; right: 5px; background: var(--accent); color: #000; font-size: 8px; font-weight: 900; padding: 2px 5px; border-radius: 4px; text-transform: uppercase; }
+
+        .balance-card { background: linear-gradient(135deg, #1e293b, #334155); margin: 15px; padding: 30px 20px; border-radius: 30px; color: white; position: relative; overflow: hidden; }
+        .balance-card::after { content: ''; position: absolute; top: -50%; right: -20%; width: 150px; height: 150px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+
+        .method-item { flex: 1; background: white; padding: 8px; border-radius: 18px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: center; height: 65px; overflow: hidden; }
+        .method-item img { height: 100%; width: 100%; object-fit: contain; }
+        .method-item.active { border-color: var(--primary); background: #eff6ff; }
+
+        .amt-btn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 10px 25px; }
+        .amt-btn { background: white; border: 1px solid #e2e8f0; padding: 10px 5px; border-radius: 10px; font-size: 12px; font-weight: 700; color: var(--secondary); cursor: pointer; transition: 0.2s; }
+        .amt-btn:active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .nav-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); display: flex; height: 75px; align-items: center; border-top: 1px solid #e2e8f0; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { flex: 1; text-align: center; color: #94a3b8; font-size: 10px; font-weight: 700; transition: 0.3s; cursor: pointer;}
+        .nav-item.active { color: var(--primary); }
+        .nav-item i { font-size: 22px; margin-bottom: 5px; display: block; }
+        
+        .nav-center { background: linear-gradient(135deg, var(--primary), var(--secondary)); width: 58px; height: 58px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; margin-top: -45px; border: 6px solid #f1f5f9; font-size: 24px; box-shadow: 0 8px 15px rgba(59, 130, 246, 0.4); cursor: pointer;}
+
+        #toast { visibility: hidden; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #334155; color: white; padding: 12px 25px; border-radius: 50px; z-index: 10000; font-size: 14px; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: 0.3s; }
+        #toast.show { visibility: visible; top: 40px; }
+
+        .page { display: none; animation: fadeIn 0.4s ease-out; padding-bottom: 100px; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        #floating-help {
+            position: fixed; width: 65px; height: 65px; bottom: 100px; right: 20px;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: white; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 28px; z-index: 9999; cursor: move;
+            touch-action: none; border: 3px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.5);
+            transition: transform 0.2s ease;
+        }
+        #floating-help::before {
+            content: ""; position: absolute; width: 100%; height: 100%;
+            border-radius: 50%; background: #2563eb; opacity: 0.6; z-index: -1;
+            animation: helpPulse 2s infinite;
+        }
+        @keyframes helpPulse {
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(1.7); opacity: 0; }
+        }
+        #floating-help:active { transform: scale(0.9); }
+
+        .music-btn { background: none; border: none; cursor: pointer; color: #64748b; font-size: 18px; }
+        .refresh-btn { cursor: pointer; transition: 0.3s; }
+        .refresh-btn:active { transform: rotate(180deg); }
+
+        .history-card { background: white; margin: 15px; border-radius: 20px; overflow-x: auto; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; min-width: 350px; }
+        th { background: #f8fafc; padding: 15px 10px; font-size: 12px; color: #64748b; text-align: left; }
+        td { padding: 15px 10px; font-size: 13px; border-top: 1px solid #f1f5f9; font-weight: 600; }
+        
+        .status-Pending { color: #f59e0b; background: #fef3c7; padding: 4px 8px; border-radius: 6px; font-size: 11px; }
+        .status-Success { color: #10b981; background: #d1fae5; padding: 4px 8px; border-radius: 6px; font-size: 11px; }
+        .status-Rejected { color: #ef4444; background: #fee2e2; padding: 4px 8px; border-radius: 6px; font-size: 11px; }
+
+        .hidden { display: none; }
+        .turnover-info { background: #fffbeb; color: #92400e; padding: 10px; border-radius: 12px; margin: 10px 25px; font-size: 12px; font-weight: 600; border: 1px solid #fde68a; }
+        .rejection-reason { display: block; font-size: 10px; color: var(--danger); font-style: italic; margin-top: 4px; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div id="toast">Message</div>
+
+    <div id="floating-help" onclick="openHelp()">
+        <i class="fas fa-comment-dots"></i>
+    </div>
+
+    <div id="auth-container">
+        <div class="app-shell">
+            <div class="auth-header">
+                <div class="brand-logo">BOOMX CLUB <span></span></div>
+                <p style="font-size: 13px; margin-top: 8px; opacity: 0.9; font-weight: 300;">Win Big with the Most Trusted Platform</p>
+            </div>
+            
+            <div class="tab-box">
+                <div class="auth-tab active" id="tab-login" onclick="switchAuth('login')">Login</div>
+                <div class="auth-tab" id="tab-reg" onclick="switchAuth('reg')">Register</div>
+            </div>
+            
+            <div id="login-view">
+                <div class="input-group"><label>Account Number</label><div class="input-wrapper"><i class="fas fa-phone-alt" style="color:var(--primary)"></i><input type="number" id="l-phone" placeholder="01XXX-XXXXXX"></div></div>
+                <div class="input-group"><label>Password</label><div class="input-wrapper"><i class="fas fa-unlock-alt" style="color:var(--primary)"></i><input type="password" id="l-pass" placeholder="••••••••"></div></div>
+                <button class="btn-main" onclick="processLogin()">Login to Account</button>
+            </div>
+
+            <div id="reg-view" class="hidden">
+                <div class="input-group"><label>Phone Number</label><div class="input-wrapper"><span style="font-weight:700; color:var(--primary)">+880</span><input type="number" id="r-phone" placeholder="1XXX-XXXXXX"></div></div>
+                <div class="input-group"><label>New Password</label><div class="input-wrapper"><i class="fas fa-lock" style="color:var(--primary)"></i><input type="password" id="r-pass" placeholder="Min 6 characters"></div></div>
+                <div class="input-group"><label>Confirm Password</label><div class="input-wrapper"><i class="fas fa-shield-alt" style="color:var(--primary)"></i><input type="password" id="r-cpass" placeholder="Repeat password"></div></div>
+                <div class="input-group"><label>Invite Code</label><div class="input-wrapper"><i class="fas fa-gift" style="color:var(--primary)"></i><input type="text" id="r-ref" placeholder="Optional"></div></div>
+                <button class="btn-main" onclick="processRegister()">Create Account</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-dashboard" class="hidden">
+        <div class="app-shell">
+            <div class="top-bar">
+                <div class="brand-logo" style="color:var(--secondary); font-size: 22px;">BOOMX CLUB<span></span></div>
+                <div style="display:flex; gap:18px; align-items:center;">
+                    <button class="music-btn" onclick="toggleMusic()">
+                        <i id="music-icon" class="fas fa-volume-up"></i>
+                    </button>
+                    <i class="fas fa-bell" style="color:#64748b; font-size: 18px;"></i>
+                    <i class="fas fa-headset" onclick="openHelp()" style="color:var(--primary); font-size: 20px; cursor:pointer;"></i>
+                </div>
+            </div>
+
+            <div id="home-page" class="page active">
+                <div class="slider-container">
+                    <div class="hero-banner" id="slider"></div>
+                    <div class="slider-dots" id="slider-dots"></div>
+                </div>
+                
+                <div class="notice-bar">
+                    <i class="fas fa-volume-up" style="color: var(--accent);"></i>
+                    <marquee style="font-size: 12px; font-weight: 700; color: #475569;">Welcome to BOOMX CLUB! Deposit now and get 100% bonus on your first deposit. Withdrawals within 30 mins. 🔥</marquee>
+                </div>
+
+                <div class="cat-scroll">
+                    <div class="cat-btn active"><i class="fas fa-th-large"></i>All</div>
+                    <div class="cat-btn"><i class="fas fa-gamepad"></i>Slots</div>
+                    <div class="cat-btn"><i class="fas fa-users"></i>Live</div>
+                    <div class="cat-btn"><i class="fas fa-fish"></i>Fishing</div>
+                    <div class="cat-btn"><i class="fas fa-basketball-ball"></i>Sports</div>
+                    <div class="cat-btn"><i class="fas fa-dice"></i>Casino</div>
+                </div>
+
+                <div class="game-grid">
+                    <div class="game-btn" onclick="playGame('Aviator')"><span class="game-tag">Hot</span><img src="https://i.ibb.co.com/JFghqyzg/804.png"><p>Aviator</p></div>
+                    <div class="game-btn" onclick="playGame('Wingo')"><span class="game-tag">Hot</span><img src="https://i.ibb.co.com/fYPr2Q7B/lotterycategory-2025060317031148t4.png"><p>WinGo</p></div>
+                    <div class="game-btn" onclick="playGame('JILI Slot')"><span class="game-tag">New</span><img src="https://files.catbox.moe/tl6rjy.png"><p>Super Ace</p></div>
+                    <div class="game-btn" onclick="playGame('PG Soft')"><img src="https://files.catbox.moe/5z5kd1.png"><p>Crazy Time</p></div>
+                    <div class="game-btn" onclick="playGame('Pragmatic Play')"><span class="game-tag">Popular</span><img src="https://files.catbox.moe/11vvpx.png"><p>Gates of Olympus</p></div>
+                    <div class="game-btn" onclick="playGame('Chicken')"><img src="https://i.ibb.co.com/Nnx8MPYg/121.png"><p>Chicken</p></div>
+                    <div class="game-btn" onclick="playGame('Boom')"><img src="https://ossimg.crhhh.com/bdtgame/gamelogo/TB_Chess/811.png"><p>Boom</p></div>
+                    <div class="game-btn" onclick="playGame('Jackpot')"><img src="https://files.catbox.moe/gzj1wf.jpg"><p>Jackpot</p></div>
+                    <div class="game-btn" onclick="playGame('3 CARDS')"><img src="https://files.catbox.moe/5qw81v.jpg"><p>3 CARDS</p></div>
+                </div>
+            </div>
+
+            <div id="agency-page" class="page">
+                 <div class="balance-card" style="text-align:center; background: linear-gradient(135deg, #0f172a, #1e293b);">
+                    <p style="opacity:0.7; font-size: 14px;">Invite Earnings</p>
+                    <h1 id="total-comm-display" style="font-size:38px; margin: 10px 0;">৳ 0.00</h1>
+                    <div style="display:inline-block; background:rgba(255,255,255,0.1); padding:5px 15px; border-radius:50px; font-size:12px;">5% Commission Level</div>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; padding:0 15px;">
+                    <div style="background:white; padding:15px; border-radius:20px; text-align:center;">
+                        <b id="team-count-display" style="font-size:20px; color:var(--primary); display:block;">0</b>
+                        <span style="font-size:12px; color:#64748b;">Total Team</span>
+                    </div>
+                    <div style="background:white; padding:15px; border-radius:20px; text-align:center;">
+                        <b id="today-earn-display" style="font-size:20px; color:var(--success); display:block;">৳0</b>
+                        <span style="font-size:12px; color:#64748b;">Today Earn</span>
+                    </div>
+                </div>
+                <div style="background:white; margin:15px; padding:25px; border-radius:25px;">
+                    <h4 style="margin-bottom: 5px;">Invitation Code</h4>
+                    <div style="background:#f8fafc; padding:15px; border-radius:15px; font-size:20px; font-weight:800; border:1px dashed #cbd5e1; display:flex; justify-content:space-between; align-items:center;">
+                        <span id="ref-code-display">...</span>
+                        <button onclick="copyRefCode()" style="background:var(--primary); color:white; border:none; padding:5px 12px; border-radius:8px; font-size:12px;">Copy</button>
+                    </div>
+                    <h4 style="margin-top: 20px;">Invitation Link</h4>
+                    <div id="ref-link-display" style="background:#f8fafc; padding:15px; border-radius:15px; font-size:12px; border:1px solid #e2e8f0; word-break: break-all; margin-top:10px; color:#64748b;">Generating...</div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
+                        <button class="btn-main" style="width:100%; margin:0;" onclick="copyRefLink()">Copy Link</button>
+                        <button class="btn-main" style="width:100%; margin:0; background:#0088cc;" onclick="shareTelegram()">
+                            <i class="fab fa-telegram-plane"></i> Telegram
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="deposit-page" class="page">
+                <div style="padding:20px 25px;"><h3>Deposit Money</h3></div>
+                <div style="display:flex; gap:12px; padding: 0 25px;">
+                    <div class="method-item active" id="d-bkash" onclick="setDepM('bkash')"><img src="https://i.ibb.co.com/cKwG9K3f/images.png"></div>
+                    <div class="method-item" id="d-nagad" onclick="setDepM('nagad')"><img src="https://i.ibb.co.com/wFpxNjxX/images-4.jpg"></div>
+                    <div class="method-item" id="d-binance" onclick="setDepM('binance')"><img src="https://files.catbox.moe/adzcx4.png"></div>
+                </div>
+                <div class="input-group" style="margin-top:25px;">
+                    <label id="dep-limit-label">Amount (৳100 - ৳25,000)</label>
+                    <div class="input-wrapper"><span id="dep-symbol">৳</span><input type="number" id="d-amt" placeholder="0.00"></div>
+                </div>
+                <div class="amt-btn-grid" id="amt-presets">
+                    <button class="amt-btn" onclick="setAmt(100)">100</button>
+                    <button class="amt-btn" onclick="setAmt(300)">300</button>
+                    <button class="amt-btn" onclick="setAmt(500)">500</button>
+                    <button class="amt-btn" onclick="setAmt(1000)">1000</button>
+                </div>
+                <button class="btn-main" onclick="goFinalDep()">Next Step</button>
+            </div>
+
+            <div id="final-dep-page" class="page">
+                <div style="background: white; margin: 20px; padding: 30px 20px; border-radius: 30px; text-align: center;">
+                    <h3 id="dep-name">BKASH</h3>
+                    <div style="background:#f1f5f9; padding:20px; border-radius:20px; margin:20px 0; display:flex; justify-content:space-between; align-items:center;">
+                        <span id="dep-num" style="font-size:18px; font-weight:800; word-break: break-all;">01XXXXXXXXX</span>
+                        <button onclick="copyNum()" style="background:var(--primary); color:white; border:none; padding:8px 15px; border-radius:10px; font-size:12px; flex-shrink:0;">Copy</button>
+                    </div>
+                    <div class="input-group" style="text-align:left;">
+                        <label>Transaction ID / Hash</label>
+                        <div class="input-wrapper"><input type="text" id="txid" placeholder="TxID"></div>
+                    </div>
+                    <button class="btn-main" style="width:100%; margin:20px 0 0;" onclick="submitDep()">Submit Deposit</button>
+                </div>
+            </div>
+
+            <div id="withdraw-page" class="page">
+                <div style="padding:20px 25px;"><h3>Withdraw Funds</h3></div>
+                <div id="turnover-box" class="turnover-info">Required Turnover: ৳<span id="user-turnover">0</span></div>
+                <div style="display:flex; gap:12px; padding: 0 25px;">
+                    <div class="method-item active" id="w-bkash" onclick="setWithM('bkash')"><img src="https://i.ibb.co.com/cKwG9K3f/images.png"></div>
+                    <div class="method-item" id="w-nagad" onclick="setWithM('nagad')"><img src="https://i.ibb.co.com/wFpxNjxX/images-4.jpg"></div>
+                    <div class="method-item" id="w-binance" onclick="setWithM('binance')"><img src="https://files.catbox.moe/adzcx4.png"></div>
+                </div>
+                <div class="input-group" style="margin-top:25px;"><label>Wallet / Address</label><div class="input-wrapper"><input type="text" id="w-num" placeholder="Wallet Number or Address"></div></div>
+                <div class="input-group"><label id="with-limit-label">Amount (Min ৳500)</label><div class="input-wrapper"><span id="with-symbol">৳</span><input type="number" id="w-amt" placeholder="500.00"></div></div>
+                <div class="input-group"><label>Account Password</label><div class="input-wrapper"><i class="fas fa-lock" style="color:var(--primary)"></i><input type="password" id="w-pass" placeholder="Enter Login Password"></div></div>
+                <button class="btn-main" onclick="submitWith()">Withdraw Now</button>
+            </div>
+
+            <div id="gift-page" class="page">
+                <div style="padding:20px 25px;"><h3>Claim Gift Code</h3></div>
+                <div style="background:white; margin:15px; padding:20px; border-radius:25px;">
+                    <div class="input-group" style="margin:0;"><label>Enter Gift Code</label><div class="input-wrapper"><i class="fas fa-gift" style="color:var(--primary)"></i><input type="text" id="gift-input" placeholder="Enter Code Here"></div></div>
+                    <button class="btn-main" style="width:100%; margin:20px 0 0;" onclick="claimGift()">Claim Now</button>
+                </div>
+                <div style="padding:0 25px;"><h4>Claim History</h4></div>
+                <div class="history-card">
+                    <table><thead><tr><th>Date</th><th>Code</th><th>Amount</th></tr></thead><tbody id="gift-list"></tbody></table>
+                </div>
+            </div>
+
+            <div id="account-page" class="page">
+                <div class="balance-card">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <p>Main Balance</p>
+                            <h1 id="user-bal">৳ 0.00</h1>
+                        </div>
+                        <i class="fas fa-sync-alt refresh-btn" onclick="refreshBalance()" style="font-size:20px; opacity:0.8;"></i>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; background:rgba(255,255,255,0.1); padding:10px 15px; border-radius:15px;">
+                        <span style="font-size:12px;">UID: <b id="uid-gen">000000</b></span>
+                        <i class="fas fa-copy" onclick="copyUID()" style="cursor:pointer; font-size:14px;"></i>
+                    </div>
+                </div>
+                <div style="background:white; margin:15px; border-radius:25px; overflow:hidden; border: 1px solid #e2e8f0;">
+                    <div style="padding:18px 25px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between;" onclick="nav('deposit')">
+                        <span><i class="fas fa-wallet" style="color:var(--success); width:25px;"></i> Deposit Money</span>
+                        <i class="fas fa-chevron-right" style="color:#ccc;"></i>
+                    </div>
+                    <div style="padding:18px 25px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between;" onclick="nav('gift')">
+                        <span><i class="fas fa-gift" style="color:var(--accent); width:25px;"></i> Gift Code</span>
+                        <i class="fas fa-chevron-right" style="color:#ccc;"></i>
+                    </div>
+                    <div style="padding:18px 25px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between;" onclick="nav('dep-hist')">
+                        <span><i class="fas fa-list" style="color:var(--primary); width:25px;"></i> Deposit History</span>
+                        <i class="fas fa-chevron-right" style="color:#ccc;"></i>
+                    </div>
+                    <div style="padding:18px 25px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between;" onclick="nav('withdraw')">
+                        <span><i class="fas fa-money-bill-wave" style="color:#e67e22; width:25px;"></i> Withdraw Money</span>
+                        <i class="fas fa-chevron-right" style="color:#ccc;"></i>
+                    </div>
+                    <div style="padding:18px 25px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between;" onclick="nav('with-hist')">
+                        <span><i class="fas fa-receipt" style="color:#6366f1; width:25px;"></i> Withdraw History</span>
+                        <i class="fas fa-chevron-right" style="color:#ccc;"></i>
+                    </div>
+                    <div style="padding:18px 25px; color:var(--danger);" onclick="logout()">
+                        <i class="fas fa-sign-out-alt" style="width:25px;"></i> <b>Logout</b>
+                    </div>
+                </div>
+            </div>
+
+            <div id="dep-hist-page" class="page">
+                <div style="padding:20px 25px;"><h3>Deposit History</h3></div>
+                <div class="history-card">
+                    <table><thead><tr><th>Date</th><th>Amount</th><th>Status</th></tr></thead><tbody id="dep-list"></tbody></table>
+                </div>
+            </div>
+
+            <div id="with-hist-page" class="page">
+                <div style="padding:20px 25px;"><h3>Withdraw History</h3></div>
+                <div class="history-card">
+                    <table><thead><tr><th>Date</th><th>Amount</th><th>Status</th></tr></thead><tbody id="with-list"></tbody></table>
+                </div>
+            </div>
+
+            <div class="nav-bar">
+                <div class="nav-item active" id="n-home" onclick="nav('home')"><i class="fas fa-home"></i>Home</div>
+                <div class="nav-item" id="n-deposit" onclick="nav('deposit')"><i class="fas fa-wallet"></i>Deposit</div>
+                <div class="nav-center" onclick="nav('agency')"><i class="fas fa-users"></i></div>
+                <div class="nav-item" id="n-withdraw" onclick="nav('withdraw')"><i class="fas fa-money-bill"></i>Withdraw</div>
+                <div class="nav-item" id="n-account" onclick="nav('account')"><i class="fas fa-user-circle"></i>Profile</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, get, update, increment } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAH9TisZRvwYPPCLGmXyJmUnrmse_7Gy_o",
+            authDomain: "betclub71-dba12.firebaseapp.com",
+            databaseURL: "https://betclub71-dba12-default-rtdb.firebaseio.com",
+            projectId: "betclub71-dba12",
+            storageBucket: "betclub71-dba12.firebasestorage.app",
+            messagingSenderId: "796420307510",
+            appId: "1:796420307510:web:93df880a124b000a347697",
+            measurementId: "G-9QSZD6XNSL"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const configData = {
+            bkash: ["01403496351", "01933098049"],
+            nagad: ["01765943426", "01833229482"],
+            binance: ["1046800356"], 
+            sliders: ["https://i.ibb.co.com/4n5PdnhJ/1768207704307.png", "https://i.ibb.co.com/Gvzsm3T1/1768207785318.png", "https://i.ibb.co.com/KjtGDRx1/1768207691634.png"]
+        };
+
+        const gameLinks = { 
+            'Aviator': 'https://xmod.top/p/avatior', 
+            'Wingo': 'wingoboomx.vercel.app',
+            'Chicken': '#', 'JILI Slot': '#', 'PG Soft': '#', 'Pragmatic Play': '#' 
+        };
+
+        const gatewayLinks = { 'bkash': 'https://Ebuy-sell.shop/71/Bikash.html', 'nagad': 'https://Ebuy-sell.shop/71/nagad.html', 'binance': 'https://Ebuy-sell.shop/71/binance.html' };
+        const COMMISSION_RATE = 0.05;
+
+        window.refreshBalance = async function() {
+            const phone = localStorage.getItem('userPhone');
+            const snap = await get(ref(db, 'users/' + phone));
+            if(snap.exists()){
+                document.getElementById('user-bal').innerText = "৳ " + parseFloat(snap.val().balance).toFixed(2);
+                showToast("🔄 ব্যালেন্স আপডেট হয়েছে");
+            }
+        }
+
+        window.playGame = async function(name) {
+            const url = gameLinks[name];
+            const phone = localStorage.getItem('userPhone');
+            if(url && url !== '#') {
+                const userSnap = await get(ref(db, 'users/' + phone));
+                const userData = userSnap.val();
+                if(userData.referredBy) {
+                    const allUsersSnap = await get(ref(db, 'users'));
+                    allUsersSnap.forEach(u => {
+                        if(u.val().uid == userData.referredBy) {
+                            const comm = 10 * COMMISSION_RATE;
+                            update(ref(db, 'users/' + u.key), { balance: increment(comm), totalCommission: increment(comm) });
+                        }
+                    });
+                }
+                if(userData.turnover > 0) { update(ref(db, 'users/' + phone), { turnover: Math.max(0, userData.turnover - 10) }); }
+                showToast("🎮 " + name + " লোড হচ্ছে...");
+                setTimeout(() => { window.location.href = url + "?user=" + phone; }, 800);
+            } else { showToast("⏳ শীঘ্রই আসছে..."); }
+        };
+
+        window.processLogin = async function() {
+            const phone = document.getElementById('l-phone').value;
+            const pass = document.getElementById('l-pass').value;
+            const snapshot = await get(ref(db, 'users/' + phone));
+            if (snapshot.exists() && snapshot.val().password === pass) {
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userPhone', phone);
+                enterDashboard();
+            } else { showToast("❌ ভুল তথ্য!"); }
+        };
+
+        window.processRegister = async function() {
+            const phone = document.getElementById('r-phone').value;
+            const pass = document.getElementById('r-pass').value;
+            const refCode = document.getElementById('r-ref').value;
+            if(phone.length < 10 || pass.length < 4) return showToast("❌ সঠিক তথ্য দিন");
+            const newUser = { phone, password: pass, balance: 0, turnover: 0, uid: Math.floor(100000 + Math.random() * 900000), referredBy: refCode || "", totalCommission: 0, totalTeam: 0 };
+            await set(ref(db, 'users/' + phone), newUser);
+            if(refCode) {
+                const allUsersSnap = await get(ref(db, 'users'));
+                allUsersSnap.forEach(u => { if(u.val().uid == refCode) { update(ref(db, 'users/' + u.key), { totalTeam: increment(1) }); } });
+            }
+            showToast("✅ সফল!"); switchAuth('login');
+        };
+
+        window.submitWith = async function() {
+            const amt = parseFloat(document.getElementById('w-amt').value);
+            const num = document.getElementById('w-num').value;
+            const pass = document.getElementById('w-pass').value;
+            const phone = localStorage.getItem('userPhone');
+            const limit = selectedWithM === 'binance' ? 5 : 500;
+            const symbol = selectedWithM === 'binance' ? "$" : "৳";
+            if(!num || amt < limit) return showToast(`❌ সর্বনিম্ন ${symbol}${limit}`);
+            if(!pass) return showToast("❌ পাসওয়ার্ড দিন");
+            const snap = await get(ref(db, 'users/' + phone));
+            const userData = snap.val();
+            if(userData.password !== pass) return showToast("❌ ভুল পাসওয়ার্ড!");
+            if((userData.turnover || 0) > 0) return showToast(`❌ আপনার ৳${userData.turnover} টার্নওভার বাকি আছে!`);
+            if((userData.balance || 0) < (selectedWithM === 'binance' ? amt * 123 : amt)) return showToast("❌ পর্যাপ্ত ব্যালেন্স নেই");
+            let finalDeduct = selectedWithM === 'binance' ? amt * 123 : amt;
+            await update(ref(db, 'users/' + phone), { balance: userData.balance - finalDeduct });
+            await push(ref(db, 'withdrawals/'), { phone, amount: amt, method: selectedWithM.toUpperCase(), wallet: num, symbol: symbol, status: 'Pending', date: new Date().toLocaleString() });
+            showToast("✅ রিকোয়েস্ট পাঠানো হয়েছে"); nav('account');
+        };
+
+        window.submitDep = function() {
+            const amt = document.getElementById('d-amt').value;
+            const txid = document.getElementById('txid').value;
+            const phone = localStorage.getItem('userPhone');
+            const symbol = selectedDepM === 'binance' ? "$" : "৳";
+            if(!txid) return showToast("❌ TxID/Hash দিন");
+            push(ref(db, 'deposits/'), { phone, amount: amt, method: selectedDepM.toUpperCase(), txid, symbol: symbol, status: 'Pending', date: new Date().toLocaleString() });
+            showToast("✅ রিকোয়েস্ট পাঠানো হয়েছে"); nav('account');
+        };
+
+        window.claimGift = async function() {
+            const code = document.getElementById('gift-input').value.trim();
+            const phone = localStorage.getItem('userPhone');
+            if(!code) return showToast("❌ কোড লিখুন");
+            const giftSnap = await get(ref(db, 'gift_codes/' + code));
+            if(giftSnap.exists()) {
+                const claimCheck = await get(ref(db, `users/${phone}/claimed_gifts/${code}`));
+                if(claimCheck.exists()) return showToast("❌ ইতিমধ্যে নিয়েছেন");
+                const userSnap = await get(ref(db, 'users/' + phone));
+                await set(ref(db, `users/${phone}/balance`), (userSnap.val().balance || 0) + parseFloat(giftSnap.val().amount));
+                await set(ref(db, `users/${phone}/claimed_gifts/${code}`), { code, amount: giftSnap.val().amount, date: new Date().toLocaleDateString() });
+                showToast(`✅ ৳${giftSnap.val().amount} বোনাস পেয়েছেন!`);
+            } else { showToast("❌ অবৈধ কোড"); }
+        };
+
+        window.enterDashboard = function() {
+            document.getElementById('auth-container').classList.add('hidden');
+            document.getElementById('main-dashboard').classList.remove('hidden');
+            const phone = localStorage.getItem('userPhone');
+            onValue(ref(db, 'users/' + phone), (snap) => {
+                const data = snap.val();
+                if(data) {
+                    document.getElementById('user-bal').innerText = "৳ " + parseFloat(data.balance).toFixed(2);
+                    document.getElementById('uid-gen').innerText = data.uid;
+                    document.getElementById('user-turnover').innerText = data.turnover || 0;
+                    document.getElementById('ref-link-display').innerText = window.location.origin + window.location.pathname + "?ref=" + data.uid;
+                    document.getElementById('ref-code-display').innerText = data.uid;
+                    document.getElementById('total-comm-display').innerText = "৳ " + (data.totalCommission || 0).toFixed(2);
+                    document.getElementById('team-count-display').innerText = data.totalTeam || 0;
+                }
+            });
+            loadHistories();
+        };
+
+        window.loadHistories = function() {
+            const phone = localStorage.getItem('userPhone');
+            onValue(ref(db, 'deposits/'), (snapshot) => {
+                let html = "";
+                snapshot.forEach(child => { 
+                    const data = child.val(); 
+                    if(data.phone === phone) {
+                        const sym = data.symbol || "৳";
+                        html = `<tr><td>${data.date}</td><td>${sym}${data.amount}</td><td><span class="status-${data.status}">${data.status}</span></td></tr>` + html; 
+                    }
+                });
+                document.getElementById('dep-list').innerHTML = html || "<tr><td colspan='3'>No Data</td></tr>";
+            });
+            onValue(ref(db, 'withdrawals/'), (snapshot) => {
+                let html = "";
+                snapshot.forEach(child => { 
+                    const data = child.val(); 
+                    if(data.phone === phone) {
+                        const sym = data.symbol || "৳";
+                        html = `<tr><td>${data.date}</td><td>${sym}${data.amount}</td><td><span class="status-${data.status}">${data.status}</span></td></tr>` + html; 
+                    }
+                });
+                document.getElementById('with-list').innerHTML = html || "<tr><td colspan='3'>No Data</td></tr>";
+            });
+            onValue(ref(db, `users/${phone}/claimed_gifts`), (snapshot) => {
+                let html = "";
+                snapshot.forEach(child => {
+                    const data = child.val();
+                    html = `<tr><td>${data.date}</td><td>${data.code}</td><td>৳${data.amount}</td></tr>` + html;
+                });
+                document.getElementById('gift-list').innerHTML = html || "<tr><td colspan='3'>No History</td></tr>";
+            });
+        }
+
+        if(localStorage.getItem('isLoggedIn') === 'true') enterDashboard();
+
+        window.goFinalDep = function() {
+            let amt = document.getElementById('d-amt').value;
+            let phone = localStorage.getItem('userPhone');
+            const targetUrl = gatewayLinks[selectedDepM];
+            if(targetUrl) {
+                window.location.href = `${targetUrl}?amount=${amt}&user=${phone}&method=${selectedDepM}`;
+            } else {
+                nav('final-dep');
+                document.getElementById('dep-num').innerText = selectedDepM === 'binance' ? configData.binance[0] : configData[selectedDepM][0];
+                document.getElementById('dep-name').innerText = selectedDepM.toUpperCase();
+            }
+        };
+
+        let currentSlide = 0;
+        setInterval(() => {
+            const s = document.getElementById('slider');
+            const dots = document.getElementById('slider-dots');
+            if(s) {
+                s.style.backgroundImage = `url('${configData.sliders[currentSlide]}')`;
+                dots.innerHTML = configData.sliders.map((_, i) => `<div class="dot ${i===currentSlide?'active':''}"></div>`).join('');
+                currentSlide = (currentSlide + 1) % configData.sliders.length;
+            }
+        }, 4000);
+
+        window.copyRefCode = function() {
+            const code = document.getElementById('ref-code-display').innerText;
+            navigator.clipboard.writeText(code);
+            showToast("📋 Referral Code Copied!");
+        }
+        window.copyRefLink = function() {
+            const link = document.getElementById('ref-link-display').innerText;
+            navigator.clipboard.writeText(link);
+            showToast("📋 Referral Link Copied!");
+        }
+        window.shareTelegram = function() {
+            const link = document.getElementById('ref-link-display').innerText;
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join BOOMX CLUB and win big!`, '_blank');
+        }
+        window.copyNum = function() {
+            const num = document.getElementById('dep-num').innerText;
+            navigator.clipboard.writeText(num);
+            showToast("📋 Number/ID Copied!");
+        }
+    </script>
+
+    <script>
+        let selectedDepM = 'bkash';
+        let selectedWithM = 'bkash';
+        function setAmt(val) { document.getElementById('d-amt').value = val; }
+        function copyUID() { navigator.clipboard.writeText(document.getElementById('uid-gen').innerText); showToast("📋 UID কপি হয়েছে!"); }
+        function switchAuth(t) { document.getElementById('login-view').classList.toggle('hidden', t === 'reg'); document.getElementById('reg-view').classList.toggle('hidden', t === 'login'); document.getElementById('tab-login').classList.toggle('active', t === 'login'); document.getElementById('tab-reg').classList.toggle('active', t === 'reg'); }
+        function nav(p) { document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active')); if(document.getElementById(p + '-page')) document.getElementById(p + '-page').classList.add('active'); document.querySelectorAll('.nav-item').forEach(ni => ni.classList.remove('active')); if(document.getElementById('n-'+p)) document.getElementById('n-'+p).classList.add('active'); }
+        function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+        function logout() { localStorage.clear(); location.reload(); }
+        function openHelp() { window.open('https://stupendous-capybara-35a501.netlify.app/', '_blank'); }
+        
+        function setDepM(m) { 
+            selectedDepM = m; 
+            document.querySelectorAll('#deposit-page .method-item').forEach(i => i.classList.remove('active')); 
+            document.getElementById('d-'+m).classList.add('active'); 
+            const symbol = m === 'binance' ? "$" : "৳";
+            document.getElementById('dep-symbol').innerText = symbol;
+            document.getElementById('dep-limit-label').innerText = `Amount (${symbol}${m==='binance'?'1':'100'} - ${symbol}${m==='binance'?'500':'25,000'})`;
+        }
+        
+        function setWithM(m) { 
+            selectedWithM = m; 
+            document.querySelectorAll('#withdraw-page .method-item').forEach(i => i.classList.remove('active')); 
+            document.getElementById('w-'+m).classList.add('active'); 
+            const symbol = m === 'binance' ? "$" : "৳";
+            const limit = m === 'binance' ? "5" : "500";
+            document.getElementById('with-symbol').innerText = symbol;
+            document.getElementById('with-limit-label').innerText = `Amount (Min ${symbol}${limit})`;
+        }
+
+        const helpBtn = document.getElementById("floating-help");
+        let isDragging = false;
+        helpBtn.addEventListener("touchstart", () => isDragging = true);
+        document.addEventListener("touchmove", (e) => {
+            if (isDragging) {
+                let touch = e.touches[0];
+                helpBtn.style.left = touch.clientX - 30 + "px";
+                helpBtn.style.top = touch.clientY - 30 + "px";
+                helpBtn.style.right = "auto";
+                helpBtn.style.bottom = "auto";
+            }
+        });
+        document.addEventListener("touchend", () => isDragging = false);
+
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ref = urlParams.get('ref');
+            if (ref && document.getElementById('r-ref')) {
+                document.getElementById('r-ref').value = ref;
+                switchAuth('reg');
+            }
+        });
+    </script>
+</body>
+</html>
