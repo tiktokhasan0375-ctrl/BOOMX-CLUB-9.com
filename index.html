@@ -503,7 +503,6 @@
                     document.getElementById('uid-gen').innerText = data.uid;
                     document.getElementById('user-turnover').innerText = data.turnover || 0;
                     
-                    // আপনার দেওয়া নতুন ডোমেইন এখানে সেট করা হয়েছে
                     const baseDomain = "https://boomx-club-21-com.vercel.app/";
                     document.getElementById('ref-link-display').innerText = baseDomain + "?ref=" + data.uid;
                     
@@ -640,14 +639,20 @@
         });
         document.addEventListener("touchend", () => isDragging = false);
 
-        window.addEventListener('load', () => {
+        // অটোমেটিক রেফারেল কোড রিড করার ফাংশন
+        function checkReferral() {
             const urlParams = new URLSearchParams(window.location.search);
-            const ref = urlParams.get('ref');
-            if (ref && document.getElementById('r-ref')) {
-                document.getElementById('r-ref').value = ref;
-                switchAuth('reg');
+            const refCode = urlParams.get('ref');
+            const refInput = document.getElementById('r-ref');
+            
+            if (refCode && refInput) {
+                refInput.value = refCode; // ইনপুটে কোড বসাবে
+                switchAuth('reg'); // সরাসরি রেজিস্ট্রেশন পেজ ওপেন করবে
             }
-        });
+        }
+
+        // পেজ লোড হওয়ার সাথে সাথে চেক করবে
+        window.addEventListener('DOMContentLoaded', checkReferral);
     </script>
 </body>
 </html>
