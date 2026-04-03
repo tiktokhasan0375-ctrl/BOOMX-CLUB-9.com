@@ -246,7 +246,7 @@
                 <div class="amt-btn-grid" id="amt-presets">
                     <button class="amt-btn" onclick="setAmt(100)">100</button>
                     <button class="amt-btn" onclick="setAmt(300)">300</button>
-                    <button class="amt-btn" onclick="setAmt(500)">500</button>
+                    <button class="amt-btn" onclick="setAmt(10)">100</button>
                     <button class="amt-btn" onclick="setAmt(1000)">1000</button>
                 </div>
                 <button class="btn-main" onclick="goFinalDep()">Next Step</button>
@@ -276,7 +276,7 @@
                     <div class="method-item" id="w-binance" onclick="setWithM('binance')"><img src="https://files.catbox.moe/adzcx4.png"></div>
                 </div>
                 <div class="input-group" style="margin-top:25px;"><label>Wallet / Address</label><div class="input-wrapper"><input type="text" id="w-num" placeholder="Wallet Number or Address"></div></div>
-                <div class="input-group"><label id="with-limit-label">Amount (Min ৳500)</label><div class="input-wrapper"><span id="with-symbol" style="font-weight: 700;">৳</span><input type="number" id="w-amt" placeholder="500.00"></div></div>
+                <div class="input-group"><label id="with-limit-label">Amount (Min ৳100)</label><div class="input-wrapper"><span id="with-symbol" style="font-weight: 700;">৳</span><input type="number" id="w-amt" placeholder="100.00"></div></div>
                 <div class="input-group"><label>Account Password</label><div class="input-wrapper"><i class="fas fa-lock" style="color:var(--primary)"></i><input type="password" id="w-pass" placeholder="Enter Login Password"></div></div>
                 <button class="btn-main" onclick="submitWith()">Withdraw Now</button>
             </div>
@@ -380,7 +380,7 @@
             bkash: ["01403496351", "01933098049"],
             nagad: ["01765943426", "01833229482"],
             binance: ["1046800356"], 
-            sliders: ["https://i.ibb.co.com/4n5PdnhJ/1768207704307.png", "https://i.ibb.co.com/Gvzsm3T1/1768207785318.png", "https://i.ibb.co.com/KjtGDRx1/1768207691634.png"]
+            sliders: ["https://files.catbox.moe/trjnna.jpg", "https://files.catbox.moe/ek04gx.jpg", "https://files.catbox.moe/lgn65q.jpg"]
         };
 
         const gameLinks = { 
@@ -452,7 +452,7 @@
             const num = document.getElementById('w-num').value;
             const pass = document.getElementById('w-pass').value;
             const phone = localStorage.getItem('userPhone');
-            const limit = selectedWithM === 'binance' ? 5 : 500;
+            const limit = selectedWithM === 'binance' ? 5 : 100;
             const symbol = selectedWithM === 'binance' ? "$" : "৳";
             if(!num || amt < limit) return showToast(`❌ সর্বনিম্ন ${symbol}${limit}`);
             if(!pass) return showToast("❌ পাসওয়ার্ড দিন");
@@ -612,7 +612,7 @@
             document.getElementById('d-'+m).classList.add('active'); 
             const symbol = m === 'binance' ? "$" : "৳";
             document.getElementById('dep-symbol').innerText = symbol;
-            document.getElementById('dep-limit-label').innerText = `Amount (${symbol}${m==='binance'?'1':'100'} - ${symbol}${m==='binance'?'500':'25,000'})`;
+            document.getElementById('dep-limit-label').innerText = `Amount (${symbol}${m==='binance'?'1':'100'} - ${symbol}${m==='binance'?'100':'25,000'})`;
         }
         
         function setWithM(m) { 
