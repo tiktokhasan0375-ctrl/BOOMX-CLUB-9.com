@@ -88,14 +88,14 @@
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Modified Floating Help Style */
         #floating-help {
-            position: fixed; width: 65px; height: 65px; bottom: 100px; right: 20px;
+            position: fixed; width: 60px; height: 60px; bottom: 100px; right: 20px;
             background: linear-gradient(135deg, #FFD700, #B8860B);
             color: white; border-radius: 50%; display: flex; align-items: center;
             justify-content: center; font-size: 28px; z-index: 9999; cursor: move;
             touch-action: none; border: 3px solid rgba(255, 255, 255, 0.5);
             box-shadow: 0 10px 25px rgba(184, 134, 11, 0.5);
-            transition: transform 0.2s ease;
         }
         #floating-help::before {
             content: ""; position: absolute; width: 100%; height: 100%;
@@ -131,8 +131,8 @@
 
     <div id="toast">Message</div>
 
-    <div id="floating-help" onclick="openHelp()">
-        <i class="fas fa-comment-dots"></i>
+    <div id="floating-help">
+        <i class="fas fa-headset"></i>
     </div>
 
     <div id="auth-container">
@@ -157,7 +157,7 @@
                 <div class="input-group"><label>Phone Number</label><div class="input-wrapper"><span style="font-weight:700; color:var(--primary)">+880</span><input type="number" id="r-phone" placeholder="1XXX-XXXXXX"></div></div>
                 <div class="input-group"><label>New Password</label><div class="input-wrapper"><i class="fas fa-lock" style="color:var(--primary)"></i><input type="password" id="r-pass" placeholder="Min 6 characters"></div></div>
                 <div class="input-group"><label>Confirm Password</label><div class="input-wrapper"><i class="fas fa-shield-alt" style="color:var(--primary)"></i><input type="password" id="r-cpass" placeholder="Repeat password"></div></div>
-                <div class="input-group"><label>Invite Code</label><div class="input-wrapper"><i class="fas fa-gift" style="color:var(--primary)"></i><input type="text" id="r-ref" placeholder="Optional"></div></div>
+                <div class="input-group"><label>Invite Code</label><div class="input-wrapper"><i class="fas fa-gift" style="color:var(--primary)"></i><input type="text" id="r-ref" placeholder="Automatic"></div></div>
                 <button class="btn-main" onclick="processRegister()">Create Account</button>
             </div>
         </div>
@@ -208,9 +208,9 @@
 
             <div id="agency-page" class="page">
                  <div class="balance-card" style="text-align:center;">
-                    <p style="opacity:0.7; font-size: 14px;">Invite Earnings</p>
+                    <p style="opacity:0.7; font-size: 14px;">Total Commission</p>
                     <h1 id="total-comm-display" style="font-size:38px; margin: 10px 0;">৳ 0.00</h1>
-                    <div style="display:inline-block; background:rgba(255,255,255,0.1); padding:5px 15px; border-radius:50px; font-size:12px;">5% Commission Level</div>
+                    <div style="display:inline-block; background:rgba(255,255,255,0.1); padding:5px 15px; border-radius:50px; font-size:12px;">5% Direct Commission</div>
                 </div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; padding:0 15px; margin-top: -10px;">
                     <div style="background:white; padding:15px; border-radius:20px; text-align:center; border: 1px solid #eee;">
@@ -232,7 +232,7 @@
                     <div id="ref-link-display" style="background:#f8fafc; padding:15px; border-radius:15px; font-size:12px; border:1px solid #e2e8f0; word-break: break-all; margin-top:10px; color:#64748b;">Generating...</div>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
                         <button class="btn-main" style="width:100%; margin:0;" onclick="copyRefLink()">Copy Link</button>
-                        <button class="btn-main" style="width:100%; margin:0; background:#0088cc;" onclick="shareTelegram()">
+                        <button class="btn-main" id="telegram-share-btn" style="width:100%; margin:0; background:#0088cc;">
                             <i class="fab fa-telegram-plane"></i> Telegram
                         </button>
                     </div>
@@ -257,21 +257,6 @@
                     <button class="amt-btn" onclick="setAmt(5000)">5000</button>
                 </div>
                 <button class="btn-main" onclick="goFinalDep()">Next Step</button>
-            </div>
-
-            <div id="final-dep-page" class="page">
-                <div style="background: white; margin: 20px; padding: 30px 20px; border-radius: 30px; text-align: center; border: 1px solid #eee;">
-                    <h3 id="dep-name">BKASH</h3>
-                    <div style="background:#f1f5f9; padding:20px; border-radius:20px; margin:20px 0; display:flex; justify-content:space-between; align-items:center;">
-                        <span id="dep-num" style="font-size:18px; font-weight:800; word-break: break-all; color: #333;">01XXXXXXXXX</span>
-                        <button onclick="copyNum()" style="background:var(--primary); color:white; border:none; padding:8px 15px; border-radius:10px; font-size:12px; flex-shrink:0;">Copy</button>
-                    </div>
-                    <div class="input-group" style="text-align:left;">
-                        <label>Transaction ID / Hash</label>
-                        <div class="input-wrapper"><input type="text" id="txid" placeholder="TxID"></div>
-                    </div>
-                    <button class="btn-main" style="width:100%; margin:20px 0 0;" onclick="submitDep()">Submit Deposit</button>
-                </div>
             </div>
 
             <div id="withdraw-page" class="page">
@@ -398,9 +383,6 @@
         const db = getDatabase(app);
 
         const configData = {
-            bkash: ["01403496351", "01933098049"],
-            nagad: ["01765943426", "01833229482"],
-            binance: ["1046800356"], 
             sliders: ["https://files.catbox.moe/trjnna.jpg", "https://files.catbox.moe/ek04gx.jpg", "https://files.catbox.moe/lgn65q.jpg"]
         };
 
@@ -411,6 +393,16 @@
         };
 
         const gatewayLinks = { 'bkash': 'https://jkbcjhh-u7v6.vercel.app/', 'nagad': 'https://nagad-boomax.vercel.app/', 'binance': 'https://bsjbddj.vercel.app/' };
+
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            if(refCode) {
+                document.getElementById('r-ref').value = refCode;
+                document.getElementById('r-ref').readOnly = true;
+                switchAuth('reg');
+            }
+        };
 
         window.goFinalDep = function() {
             const amt = document.getElementById('d-amt').value;
@@ -426,8 +418,6 @@
                 setTimeout(() => {
                     window.location.href = `${gatewayUrl}?amount=${amt}&user=${phone}`;
                 }, 800);
-            } else {
-                showToast("Gateway configuration missing!");
             }
         };
 
@@ -449,7 +439,7 @@
                 if(userData.turnover > 0) { update(ref(db, 'users/' + phone), { turnover: Math.max(0, userData.turnover - 10) }); }
                 showToast("🎮 " + name + " লোড হচ্ছে...");
                 setTimeout(() => { window.location.href = url + "?user=" + phone; }, 800);
-            } else { showToast("খেলার জন্য অন্তত ১০০ টাকা রিচার্জ করুন"); }
+            } else { showToast("মিনিমাম ডিপজিট ১০০ টাকা"); }
         };
 
         window.processLogin = async function() {
@@ -472,53 +462,36 @@
             const newUser = { 
                 phone, password: pass, balance: 22, turnover: 0, 
                 uid: Math.floor(100000 + Math.random() * 900000), 
-                referredBy: refCode || "", totalCommission: 0, totalTeam: 0,
-                hasDeposited: false
+                referredBy: refCode || "", totalCommission: 0, todayEarn: 0, totalTeam: 0,
+                lastLogin: Date.now()
             };
 
             await set(ref(db, 'users/' + phone), newUser);
             if(refCode) {
-                const allUsersSnap = await get(ref(db, 'users'));
-                allUsersSnap.forEach(u => { if(u.val().uid == refCode) { update(ref(db, 'users/' + u.key), { totalTeam: increment(1) }); } });
+                const usersSnap = await get(ref(db, 'users'));
+                usersSnap.forEach(u => {
+                    if(u.val().uid == refCode) {
+                        update(ref(db, 'users/' + u.key), { totalTeam: increment(1) });
+                    }
+                });
             }
             showToast("✅ সফল! ২২ টাকা বোনাস পেয়েছেন।"); switchAuth('login');
         };
 
-        // --- উইথড্র ফাংশন আপডেট ---
         window.submitWith = async function() {
             const amt = parseFloat(document.getElementById('w-amt').value);
             const pass = document.getElementById('w-pass').value;
             const phone = localStorage.getItem('userPhone');
-            
-            // এখানে global activeCard ভেরিয়েবল ব্যবহার করা হচ্ছে
-            if(!activeCard) return showToast("❌ দয়া করে একটি কার্ড সিলেক্ট করুন");
-
-            const limit = activeCard.method === 'binance' ? 5 : 100;
-            const symbol = activeCard.method === 'binance' ? "$" : "৳";
-
-            if(isNaN(amt) || amt < limit) return showToast(`❌ সর্বনিম্ন ${symbol}${limit}`);
-            if(!pass) return showToast("❌ পাসওয়ার্ড দিন");
-
+            if(!activeCard) return showToast("❌ একটি কার্ড সিলেক্ট করুন");
             const snap = await get(ref(db, 'users/' + phone));
             const userData = snap.val();
-
             if(userData.password !== pass) return showToast("❌ ভুল পাসওয়ার্ড!");
-            if((userData.turnover || 0) > 0) return showToast(`❌ আপনার ৳${userData.turnover} টার্নওভার বাকি আছে!`);
-            
-            let finalDeduct = activeCard.method === 'binance' ? amt * 123 : amt;
-            if((userData.balance || 0) < finalDeduct) return showToast("❌ পর্যাপ্ত ব্যালেন্স নেই");
+            if((userData.turnover || 0) > 0) return showToast(`❌ টার্নওভার বাকি আছে!`);
+            if(userData.balance < amt) return showToast("❌ পর্যাপ্ত ব্যালেন্স নেই");
 
-            await update(ref(db, 'users/' + phone), { balance: userData.balance - finalDeduct });
-            
-            // রিকোয়েস্ট পাঠানো হচ্ছে
+            await update(ref(db, 'users/' + phone), { balance: userData.balance - amt });
             await push(ref(db, 'withdrawals/'), { 
-                phone: phone, 
-                amount: amt, 
-                method: activeCard.method.toUpperCase(), 
-                wallet: activeCard.num, // ইউজারের সিলেক্ট করা নম্বরটি নিশ্চিতভাবে এখানে যাবে
-                symbol: symbol, 
-                status: 'Pending', 
-                date: new Date().toLocaleString() 
+                phone, amount: amt, wallet: activeCard.num, method: activeCard.method, status: 'Pending', date: new Date().toLocaleString() 
             });
             showToast("✅ রিকোয়েস্ট পাঠানো হয়েছে"); nav('account');
         };
@@ -526,36 +499,24 @@
         window.saveCard = async function() {
             const num = document.getElementById('ac-num').value.trim();
             const phone = localStorage.getItem('userPhone');
-            if(!num) return showToast("❌ নম্বর বা এড্রেস দিন");
-
-            const snap = await get(ref(db, `users/${phone}/cards`));
-            const cards = snap.val() || {};
-            if(Object.keys(cards).length >= 2) return showToast("❌ সর্বোচ্চ ২টি কার্ড এড করা সম্ভব");
-
+            if(!num) return showToast("❌ তথ্য দিন");
             await push(ref(db, `users/${phone}/cards`), { method: selectedAddM, num: num });
-            showToast("✅ কার্ড সফলভাবে সেভ হয়েছে"); nav('withdraw'); renderCards();
+            showToast("✅ সেভ হয়েছে"); nav('withdraw'); renderCards();
         };
 
         window.renderCards = async function() {
             const phone = localStorage.getItem('userPhone');
-            if(!phone) return;
             const snap = await get(ref(db, `users/${phone}/cards`));
-            const cards = snap.val() || {};
             const container = document.getElementById('withdraw-cards');
             let html = "";
-            
-            Object.keys(cards).forEach(id => {
-                const card = cards[id];
-                html += `
-                    <div class="wallet-card" onclick="selectCard('${id}', '${card.method}', '${card.num}')" id="card-${id}">
-                        <div><small style="text-transform:capitalize">${card.method}</small><div style="font-weight:700">${card.num}</div></div>
-                        <i class="fas fa-check-circle"></i>
-                    </div>`;
-            });
-
-            if(Object.keys(cards).length < 2) {
-                html += `<div class="add-card-btn" onclick="nav('add-card')"><i class="fas fa-plus"></i> Add New Card</div>`;
+            if(snap.exists()){
+                snap.forEach(c => {
+                    const card = c.val();
+                    html += `<div class="wallet-card" onclick="selectCard('${c.key}', '${card.method}', '${card.num}')" id="card-${c.key}">
+                        <div><small>${card.method}</small><div style="font-weight:700">${card.num}</div></div><i class="fas fa-check-circle"></i></div>`;
+                });
             }
+            html += `<div class="add-card-btn" onclick="nav('add-card')"><i class="fas fa-plus"></i> Add New Card</div>`;
             container.innerHTML = html;
         };
 
@@ -563,16 +524,40 @@
             document.getElementById('auth-container').classList.add('hidden');
             document.getElementById('main-dashboard').classList.remove('hidden');
             const phone = localStorage.getItem('userPhone');
+            
             onValue(ref(db, 'users/' + phone), (snap) => {
                 const data = snap.val();
                 if(data) {
+                    const now = Date.now();
+                    const oneDay = 24 * 60 * 60 * 1000;
+                    
+                    if(now - data.lastLogin > oneDay && (data.todayEarn || 0) > 0) {
+                        const dailyComm = data.todayEarn;
+                        update(ref(db, 'users/' + phone), {
+                            totalCommission: increment(dailyComm),
+                            balance: increment(dailyComm),
+                            todayEarn: 0,
+                            lastLogin: now
+                        });
+                    } else {
+                        update(ref(db, 'users/' + phone), { lastLogin: now });
+                    }
+
                     document.getElementById('user-bal').innerText = "৳ " + parseFloat(data.balance).toFixed(2);
                     document.getElementById('uid-gen').innerText = data.uid;
                     document.getElementById('user-turnover').innerText = data.turnover || 0;
-                    document.getElementById('ref-link-display').innerText = window.location.origin + "/?ref=" + data.uid;
+                    const fullLink = window.location.origin + window.location.pathname + "?ref=" + data.uid;
+                    document.getElementById('ref-link-display').innerText = fullLink;
                     document.getElementById('ref-code-display').innerText = data.uid;
                     document.getElementById('total-comm-display').innerText = "৳ " + (data.totalCommission || 0).toFixed(2);
+                    document.getElementById('today-earn-display').innerText = "৳" + (data.todayEarn || 0).toFixed(2);
                     document.getElementById('team-count-display').innerText = data.totalTeam || 0;
+
+                    // Set Telegram Share Function
+                    document.getElementById('telegram-share-btn').onclick = function() {
+                        const text = encodeURIComponent(`🔥 Join BOOMX CLUB and win big! Use my invite link to get a bonus: ${fullLink}`);
+                        window.open(`https://t.me/share/url?url=${fullLink}&text=${text}`, '_blank');
+                    };
                 }
             });
             loadHistories();
@@ -583,10 +568,8 @@
         function startSlider() {
             const slider = document.getElementById('slider');
             const dots = document.getElementById('slider-dots');
-            if(!slider) return;
             let current = 0;
-            dots.innerHTML = "";
-            configData.sliders.forEach((_, i) => dots.innerHTML += `<div class="dot ${i===0?'active':''}"></div>`);
+            dots.innerHTML = configData.sliders.map((_, i) => `<div class="dot ${i===0?'active':''}"></div>`).join('');
             setInterval(() => {
                 current = (current + 1) % configData.sliders.length;
                 slider.style.backgroundImage = `url(${configData.sliders[current]})`;
@@ -601,7 +584,7 @@
                 let html = "";
                 snapshot.forEach(child => { if(child.val().phone === phone) { 
                     const data = child.val();
-                    html = `<tr><td>${data.date}</td><td>${data.symbol||'৳'}${data.amount}</td><td><span class="status-${data.status}">${data.status}</span></td></tr>` + html; 
+                    html = `<tr><td>${data.date}</td><td>৳${data.amount}</td><td><span class="status-${data.status}">${data.status}</span></td></tr>` + html; 
                 }});
                 document.getElementById('dep-list').innerHTML = html || "<tr><td colspan='3'>No Data</td></tr>";
             });
@@ -609,7 +592,7 @@
                 let html = "";
                 snapshot.forEach(child => { if(child.val().phone === phone) { 
                     const data = child.val();
-                    html = `<tr><td>${data.date}</td><td>${data.symbol||'৳'}${data.amount}</td><td><span class="status-${data.status}">${data.status}</span></td></tr>` + html; 
+                    html = `<tr><td>${data.date}</td><td>৳${data.amount}</td><td><span class="status-${data.status}">${data.status}</span></td></tr>` + html; 
                 }});
                 document.getElementById('with-list').innerHTML = html || "<tr><td colspan='3'>No Data</td></tr>";
             });
@@ -619,12 +602,63 @@
     </script>
 
     <script>
+        // --- DRAGGABLE FLOATING BUTTON SCRIPT ---
+        const dragItem = document.getElementById("floating-help");
+        let active = false;
+        let currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+
+        dragItem.addEventListener("touchstart", dragStart, false);
+        dragItem.addEventListener("touchend", dragEnd, false);
+        dragItem.addEventListener("touchmove", drag, false);
+        dragItem.addEventListener("mousedown", dragStart, false);
+        dragItem.addEventListener("mouseup", dragEnd, false);
+        dragItem.addEventListener("mousemove", drag, false);
+
+        function dragStart(e) {
+            if (e.type === "touchstart") {
+                initialX = e.touches[0].clientX - xOffset;
+                initialY = e.touches[0].clientY - yOffset;
+            } else {
+                initialX = e.clientX - xOffset;
+                initialY = e.clientY - yOffset;
+            }
+            if (e.target === dragItem || dragItem.contains(e.target)) active = true;
+        }
+
+        function dragEnd(e) {
+            initialX = currentX; initialY = currentY; active = false;
+            // if not moved, perform click action
+            if(!currentX && !currentY) openHelp();
+        }
+
+        function drag(e) {
+            if (active) {
+                e.preventDefault();
+                if (e.type === "touchmove") {
+                    currentX = e.touches[0].clientX - initialX;
+                    currentY = e.touches[0].clientY - initialY;
+                } else {
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+                }
+                xOffset = currentX; yOffset = currentY;
+                setTranslate(currentX, currentY, dragItem);
+            }
+        }
+
+        function setTranslate(xPos, yPos, el) {
+            el.style.transform = "translate3d(" + xPos + "px, " + yPos + "px, 0)";
+        }
+
+        // --- GENERAL FUNCTIONS ---
         let selectedDepM = 'bkash';
         let selectedAddM = 'bkash'; 
         let activeCard = null;
 
         function setAmt(val) { document.getElementById('d-amt').value = val; }
         function copyUID() { navigator.clipboard.writeText(document.getElementById('uid-gen').innerText); showToast("📋 UID কপি হয়েছে!"); }
+        function copyRefCode() { navigator.clipboard.writeText(document.getElementById('ref-code-display').innerText); showToast("📋 কোড কপি হয়েছে!"); }
+        function copyRefLink() { navigator.clipboard.writeText(document.getElementById('ref-link-display').innerText); showToast("🔗 লিংক কপি হয়েছে!"); }
         function switchAuth(t) { document.getElementById('login-view').classList.toggle('hidden', t === 'reg'); document.getElementById('reg-view').classList.toggle('hidden', t === 'login'); document.getElementById('tab-login').classList.toggle('active', t === 'login'); document.getElementById('tab-reg').classList.toggle('active', t === 'reg'); }
         function nav(p) { document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active')); if(document.getElementById(p + '-page')) document.getElementById(p + '-page').classList.add('active'); document.querySelectorAll('.nav-item').forEach(ni => ni.classList.remove('active')); if(document.getElementById('n-'+p)) document.getElementById('n-'+p).classList.add('active'); }
         function showToast(m) { const t = document.getElementById('toast'); t.innerText = m; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
@@ -635,9 +669,6 @@
             selectedDepM = m; 
             document.querySelectorAll('#deposit-page .method-item').forEach(i => i.classList.remove('active')); 
             document.getElementById('d-'+m).classList.add('active'); 
-            const symbol = m === 'binance' ? "$" : "৳";
-            document.getElementById('dep-symbol').innerText = symbol;
-            document.getElementById('dep-limit-label').innerText = `Amount (${symbol}${m==='binance'?'1':'100'} - ${symbol}${m==='binance'?'100':'25,000'})`;
         }
 
         function setAddM(m) { 
@@ -647,13 +678,9 @@
         }
 
         window.selectCard = function(id, method, num) {
-            activeCard = { id, method, num }; // এখানে নম্বরটি সঠিকভাবে স্টোর হচ্ছে
+            activeCard = { id, method, num };
             document.querySelectorAll('.wallet-card').forEach(c => c.classList.remove('active'));
-            const cardEl = document.getElementById('card-'+id);
-            if(cardEl) cardEl.classList.add('active');
-            const symbol = method === 'binance' ? "$" : "৳";
-            document.getElementById('with-symbol').innerText = symbol;
-            document.getElementById('with-limit-label').innerText = `Amount (Min ${symbol}${method==='binance'?'5':'100'})`;
+            document.getElementById('card-'+id).classList.add('active');
         }
     </script>
 </body>
