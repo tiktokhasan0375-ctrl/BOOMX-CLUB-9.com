@@ -118,6 +118,13 @@
 
         .hidden { display: none; }
         .turnover-info { background: #fffbeb; color: #92400e; padding: 10px; border-radius: 12px; margin: 10px 25px; font-size: 12px; font-weight: 600; border: 1px solid #fde68a; }
+
+        .card-selector { padding: 15px 25px; display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .wallet-card { background: #f8fafc; border: 2px solid #e2e8f0; padding: 15px; border-radius: 15px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: 0.3s; }
+        .wallet-card.active { border-color: var(--primary); background: #fff; box-shadow: 0 4px 12px rgba(255,215,0,0.1); }
+        .wallet-card i { color: #94a3b8; }
+        .wallet-card.active i { color: var(--primary); }
+        .add-card-btn { border: 2px dashed #cbd5e1; background: #f8fafc; color: #64748b; font-weight: 700; padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -246,8 +253,8 @@
                 <div class="amt-btn-grid" id="amt-presets">
                     <button class="amt-btn" onclick="setAmt(100)">100</button>
                     <button class="amt-btn" onclick="setAmt(300)">300</button>
-                    <button class="amt-btn" onclick="setAmt(10)">100</button>
                     <button class="amt-btn" onclick="setAmt(1000)">1000</button>
+                    <button class="amt-btn" onclick="setAmt(5000)">5000</button>
                 </div>
                 <button class="btn-main" onclick="goFinalDep()">Next Step</button>
             </div>
@@ -270,15 +277,29 @@
             <div id="withdraw-page" class="page">
                 <div style="padding:20px 25px;"><h3>Withdraw Funds</h3></div>
                 <div id="turnover-box" class="turnover-info">Required Turnover: ৳<span id="user-turnover">0</span></div>
-                <div style="display:flex; gap:12px; padding: 0 25px;">
-                    <div class="method-item active" id="w-bkash" onclick="setWithM('bkash')"><img src="https://i.ibb.co.com/cKwG9K3f/images.png"></div>
-                    <div class="method-item" id="w-nagad" onclick="setWithM('nagad')"><img src="https://i.ibb.co.com/wFpxNjxX/images-4.jpg"></div>
-                    <div class="method-item" id="w-binance" onclick="setWithM('binance')"><img src="https://files.catbox.moe/adzcx4.png"></div>
+                
+                <div class="card-selector" id="withdraw-cards"></div>
+
+                <div class="input-group" style="margin-top:10px;">
+                    <label id="with-limit-label">Amount (Min ৳100)</label>
+                    <div class="input-wrapper"><span id="with-symbol" style="font-weight: 700;">৳</span><input type="number" id="w-amt" placeholder="100.00"></div>
                 </div>
-                <div class="input-group" style="margin-top:25px;"><label>Wallet / Address</label><div class="input-wrapper"><input type="text" id="w-num" placeholder="Wallet Number or Address"></div></div>
-                <div class="input-group"><label id="with-limit-label">Amount (Min ৳100)</label><div class="input-wrapper"><span id="with-symbol" style="font-weight: 700;">৳</span><input type="number" id="w-amt" placeholder="100.00"></div></div>
                 <div class="input-group"><label>Account Password</label><div class="input-wrapper"><i class="fas fa-lock" style="color:var(--primary)"></i><input type="password" id="w-pass" placeholder="Enter Login Password"></div></div>
                 <button class="btn-main" onclick="submitWith()">Withdraw Now</button>
+            </div>
+
+            <div id="add-card-page" class="page">
+                <div style="padding:20px 25px;"><h3>Add Bank Card</h3></div>
+                <div style="display:flex; gap:12px; padding: 0 25px;">
+                    <div class="method-item active" id="ac-bkash" onclick="setAddM('bkash')"><img src="https://i.ibb.co.com/cKwG9K3f/images.png"></div>
+                    <div class="method-item" id="ac-nagad" onclick="setAddM('nagad')"><img src="https://i.ibb.co.com/wFpxNjxX/images-4.jpg"></div>
+                    <div class="method-item" id="ac-binance" onclick="setAddM('binance')"><img src="https://files.catbox.moe/adzcx4.png"></div>
+                </div>
+                <div class="input-group" style="margin-top:25px;">
+                    <label>Wallet / Address</label>
+                    <div class="input-wrapper"><input type="text" id="ac-num" placeholder="Enter Number or Address"></div>
+                </div>
+                <button class="btn-main" onclick="saveCard()">Save Card</button>
             </div>
 
             <div id="gift-page" class="page">
@@ -390,7 +411,25 @@
         };
 
         const gatewayLinks = { 'bkash': 'https://jkbcjhh-u7v6.vercel.app/', 'nagad': 'https://nagad-boomax.vercel.app/', 'binance': 'https://bsjbddj.vercel.app/' };
-        const COMMISSION_RATE = 0.05;
+
+        window.goFinalDep = function() {
+            const amt = document.getElementById('d-amt').value;
+            const phone = localStorage.getItem('userPhone');
+            const limit = selectedDepM === 'binance' ? 1 : 100;
+            const symbol = selectedDepM === 'binance' ? "$" : "৳";
+
+            if(!amt || amt < limit) return showToast(`❌ সর্বনিম্ন ডিপোজিট ${symbol}${limit}`);
+
+            const gatewayUrl = gatewayLinks[selectedDepM];
+            if(gatewayUrl) {
+                showToast("Redirecting to Gateway...");
+                setTimeout(() => {
+                    window.location.href = `${gatewayUrl}?amount=${amt}&user=${phone}`;
+                }, 800);
+            } else {
+                showToast("Gateway configuration missing!");
+            }
+        };
 
         window.refreshBalance = async function() {
             const phone = localStorage.getItem('userPhone');
@@ -407,19 +446,10 @@
             if(url && url !== '#') {
                 const userSnap = await get(ref(db, 'users/' + phone));
                 const userData = userSnap.val();
-                if(userData.referredBy) {
-                    const allUsersSnap = await get(ref(db, 'users'));
-                    allUsersSnap.forEach(u => {
-                        if(u.val().uid == userData.referredBy) {
-                            const comm = 10 * COMMISSION_RATE;
-                            update(ref(db, 'users/' + u.key), { balance: increment(comm), totalCommission: increment(comm) });
-                        }
-                    });
-                }
                 if(userData.turnover > 0) { update(ref(db, 'users/' + phone), { turnover: Math.max(0, userData.turnover - 10) }); }
                 showToast("🎮 " + name + " লোড হচ্ছে...");
                 setTimeout(() => { window.location.href = url + "?user=" + phone; }, 800);
-            } else { showToast("Minimum recharge ৳100.00 to enter"); }
+            } else { showToast("খেলার জন্য অন্তত ১০০ টাকা রিচার্জ করুন"); }
         };
 
         window.processLogin = async function() {
@@ -438,58 +468,95 @@
             const pass = document.getElementById('r-pass').value;
             const refCode = document.getElementById('r-ref').value;
             if(phone.length < 10 || pass.length < 4) return showToast("❌ সঠিক তথ্য দিন");
-            const newUser = { phone, password: pass, balance: 0, turnover: 0, uid: Math.floor(100000 + Math.random() * 900000), referredBy: refCode || "", totalCommission: 0, totalTeam: 0 };
+            
+            const newUser = { 
+                phone, password: pass, balance: 22, turnover: 0, 
+                uid: Math.floor(100000 + Math.random() * 900000), 
+                referredBy: refCode || "", totalCommission: 0, totalTeam: 0,
+                hasDeposited: false
+            };
+
             await set(ref(db, 'users/' + phone), newUser);
             if(refCode) {
                 const allUsersSnap = await get(ref(db, 'users'));
                 allUsersSnap.forEach(u => { if(u.val().uid == refCode) { update(ref(db, 'users/' + u.key), { totalTeam: increment(1) }); } });
             }
-            showToast("✅ সফল!"); switchAuth('login');
+            showToast("✅ সফল! ২২ টাকা বোনাস পেয়েছেন।"); switchAuth('login');
         };
 
+        // --- উইথড্র ফাংশন আপডেট ---
         window.submitWith = async function() {
             const amt = parseFloat(document.getElementById('w-amt').value);
-            const num = document.getElementById('w-num').value;
             const pass = document.getElementById('w-pass').value;
             const phone = localStorage.getItem('userPhone');
-            const limit = selectedWithM === 'binance' ? 5 : 100;
-            const symbol = selectedWithM === 'binance' ? "$" : "৳";
-            if(!num || amt < limit) return showToast(`❌ সর্বনিম্ন ${symbol}${limit}`);
+            
+            // এখানে global activeCard ভেরিয়েবল ব্যবহার করা হচ্ছে
+            if(!activeCard) return showToast("❌ দয়া করে একটি কার্ড সিলেক্ট করুন");
+
+            const limit = activeCard.method === 'binance' ? 5 : 100;
+            const symbol = activeCard.method === 'binance' ? "$" : "৳";
+
+            if(isNaN(amt) || amt < limit) return showToast(`❌ সর্বনিম্ন ${symbol}${limit}`);
             if(!pass) return showToast("❌ পাসওয়ার্ড দিন");
+
             const snap = await get(ref(db, 'users/' + phone));
             const userData = snap.val();
+
             if(userData.password !== pass) return showToast("❌ ভুল পাসওয়ার্ড!");
             if((userData.turnover || 0) > 0) return showToast(`❌ আপনার ৳${userData.turnover} টার্নওভার বাকি আছে!`);
-            if((userData.balance || 0) < (selectedWithM === 'binance' ? amt * 123 : amt)) return showToast("❌ পর্যাপ্ত ব্যালেন্স নেই");
-            let finalDeduct = selectedWithM === 'binance' ? amt * 123 : amt;
+            
+            let finalDeduct = activeCard.method === 'binance' ? amt * 123 : amt;
+            if((userData.balance || 0) < finalDeduct) return showToast("❌ পর্যাপ্ত ব্যালেন্স নেই");
+
             await update(ref(db, 'users/' + phone), { balance: userData.balance - finalDeduct });
-            await push(ref(db, 'withdrawals/'), { phone, amount: amt, method: selectedWithM.toUpperCase(), wallet: num, symbol: symbol, status: 'Pending', date: new Date().toLocaleString() });
+            
+            // রিকোয়েস্ট পাঠানো হচ্ছে
+            await push(ref(db, 'withdrawals/'), { 
+                phone: phone, 
+                amount: amt, 
+                method: activeCard.method.toUpperCase(), 
+                wallet: activeCard.num, // ইউজারের সিলেক্ট করা নম্বরটি নিশ্চিতভাবে এখানে যাবে
+                symbol: symbol, 
+                status: 'Pending', 
+                date: new Date().toLocaleString() 
+            });
             showToast("✅ রিকোয়েস্ট পাঠানো হয়েছে"); nav('account');
         };
 
-        window.submitDep = function() {
-            const amt = document.getElementById('d-amt').value;
-            const txid = document.getElementById('txid').value;
+        window.saveCard = async function() {
+            const num = document.getElementById('ac-num').value.trim();
             const phone = localStorage.getItem('userPhone');
-            const symbol = selectedDepM === 'binance' ? "$" : "৳";
-            if(!txid) return showToast("❌ TxID/Hash দিন");
-            push(ref(db, 'deposits/'), { phone, amount: amt, method: selectedDepM.toUpperCase(), txid, symbol: symbol, status: 'Pending', date: new Date().toLocaleString() });
-            showToast("✅ রিকোয়েস্ট পাঠানো হয়েছে"); nav('account');
+            if(!num) return showToast("❌ নম্বর বা এড্রেস দিন");
+
+            const snap = await get(ref(db, `users/${phone}/cards`));
+            const cards = snap.val() || {};
+            if(Object.keys(cards).length >= 2) return showToast("❌ সর্বোচ্চ ২টি কার্ড এড করা সম্ভব");
+
+            await push(ref(db, `users/${phone}/cards`), { method: selectedAddM, num: num });
+            showToast("✅ কার্ড সফলভাবে সেভ হয়েছে"); nav('withdraw'); renderCards();
         };
 
-        window.claimGift = async function() {
-            const code = document.getElementById('gift-input').value.trim();
+        window.renderCards = async function() {
             const phone = localStorage.getItem('userPhone');
-            if(!code) return showToast("❌ কোড লিখুন");
-            const giftSnap = await get(ref(db, 'gift_codes/' + code));
-            if(giftSnap.exists()) {
-                const claimCheck = await get(ref(db, `users/${phone}/claimed_gifts/${code}`));
-                if(claimCheck.exists()) return showToast("❌ ইতিমধ্যে নিয়েছেন");
-                const userSnap = await get(ref(db, 'users/' + phone));
-                await set(ref(db, `users/${phone}/balance`), (userSnap.val().balance || 0) + parseFloat(giftSnap.val().amount));
-                await set(ref(db, `users/${phone}/claimed_gifts/${code}`), { code, amount: giftSnap.val().amount, date: new Date().toLocaleDateString() });
-                showToast(`✅ ৳${giftSnap.val().amount} বোনাস পেয়েছেন!`);
-            } else { showToast("❌ অবৈধ কোড"); }
+            if(!phone) return;
+            const snap = await get(ref(db, `users/${phone}/cards`));
+            const cards = snap.val() || {};
+            const container = document.getElementById('withdraw-cards');
+            let html = "";
+            
+            Object.keys(cards).forEach(id => {
+                const card = cards[id];
+                html += `
+                    <div class="wallet-card" onclick="selectCard('${id}', '${card.method}', '${card.num}')" id="card-${id}">
+                        <div><small style="text-transform:capitalize">${card.method}</small><div style="font-weight:700">${card.num}</div></div>
+                        <i class="fas fa-check-circle"></i>
+                    </div>`;
+            });
+
+            if(Object.keys(cards).length < 2) {
+                html += `<div class="add-card-btn" onclick="nav('add-card')"><i class="fas fa-plus"></i> Add New Card</div>`;
+            }
+            container.innerHTML = html;
         };
 
         window.enterDashboard = function() {
@@ -502,102 +569,60 @@
                     document.getElementById('user-bal').innerText = "৳ " + parseFloat(data.balance).toFixed(2);
                     document.getElementById('uid-gen').innerText = data.uid;
                     document.getElementById('user-turnover').innerText = data.turnover || 0;
-                    
-                    const baseDomain = "https://boomx-club-21-com.vercel.app/";
-                    document.getElementById('ref-link-display').innerText = baseDomain + "?ref=" + data.uid;
-                    
+                    document.getElementById('ref-link-display').innerText = window.location.origin + "/?ref=" + data.uid;
                     document.getElementById('ref-code-display').innerText = data.uid;
                     document.getElementById('total-comm-display').innerText = "৳ " + (data.totalCommission || 0).toFixed(2);
                     document.getElementById('team-count-display').innerText = data.totalTeam || 0;
                 }
             });
             loadHistories();
+            renderCards();
+            startSlider();
         };
+
+        function startSlider() {
+            const slider = document.getElementById('slider');
+            const dots = document.getElementById('slider-dots');
+            if(!slider) return;
+            let current = 0;
+            dots.innerHTML = "";
+            configData.sliders.forEach((_, i) => dots.innerHTML += `<div class="dot ${i===0?'active':''}"></div>`);
+            setInterval(() => {
+                current = (current + 1) % configData.sliders.length;
+                slider.style.backgroundImage = `url(${configData.sliders[current]})`;
+                document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+            }, 3000);
+            slider.style.backgroundImage = `url(${configData.sliders[0]})`;
+        }
 
         window.loadHistories = function() {
             const phone = localStorage.getItem('userPhone');
             onValue(ref(db, 'deposits/'), (snapshot) => {
                 let html = "";
-                snapshot.forEach(child => { 
-                    const data = child.val(); 
-                    if(data.phone === phone) {
-                        const sym = data.symbol || "৳";
-                        html = `<tr><td>${data.date}</td><td>${sym}${data.amount}</td><td><span class="status-${data.status}">${data.status}</span></td></tr>` + html; 
-                    }
-                });
+                snapshot.forEach(child => { if(child.val().phone === phone) { 
+                    const data = child.val();
+                    html = `<tr><td>${data.date}</td><td>${data.symbol||'৳'}${data.amount}</td><td><span class="status-${data.status}">${data.status}</span></td></tr>` + html; 
+                }});
                 document.getElementById('dep-list').innerHTML = html || "<tr><td colspan='3'>No Data</td></tr>";
             });
             onValue(ref(db, 'withdrawals/'), (snapshot) => {
                 let html = "";
-                snapshot.forEach(child => { 
-                    const data = child.val(); 
-                    if(data.phone === phone) {
-                        const sym = data.symbol || "৳";
-                        html = `<tr><td>${data.date}</td><td>${sym}${data.amount}</td><td><span class="status-${data.status}">${data.status}</span></td></tr>` + html; 
-                    }
-                });
-                document.getElementById('with-list').innerHTML = html || "<tr><td colspan='3'>No Data</td></tr>";
-            });
-            onValue(ref(db, `users/${phone}/claimed_gifts`), (snapshot) => {
-                let html = "";
-                snapshot.forEach(child => {
+                snapshot.forEach(child => { if(child.val().phone === phone) { 
                     const data = child.val();
-                    html = `<tr><td>${data.date}</td><td>${data.code}</td><td>৳${data.amount}</td></tr>` + html;
-                });
-                document.getElementById('gift-list').innerHTML = html || "<tr><td colspan='3'>No History</td></tr>";
+                    html = `<tr><td>${data.date}</td><td>${data.symbol||'৳'}${data.amount}</td><td><span class="status-${data.status}">${data.status}</span></td></tr>` + html; 
+                }});
+                document.getElementById('with-list').innerHTML = html || "<tr><td colspan='3'>No Data</td></tr>";
             });
         }
 
         if(localStorage.getItem('isLoggedIn') === 'true') enterDashboard();
-
-        window.goFinalDep = function() {
-            let amt = document.getElementById('d-amt').value;
-            let phone = localStorage.getItem('userPhone');
-            const targetUrl = gatewayLinks[selectedDepM];
-            if(targetUrl) {
-                window.location.href = `${targetUrl}?amount=${amt}&user=${phone}&method=${selectedDepM}`;
-            } else {
-                nav('final-dep');
-                document.getElementById('dep-num').innerText = selectedDepM === 'binance' ? configData.binance[0] : configData[selectedDepM][0];
-                document.getElementById('dep-name').innerText = selectedDepM.toUpperCase();
-            }
-        };
-
-        let currentSlide = 0;
-        setInterval(() => {
-            const s = document.getElementById('slider');
-            const dots = document.getElementById('slider-dots');
-            if(s) {
-                s.style.backgroundImage = `url('${configData.sliders[currentSlide]}')`;
-                dots.innerHTML = configData.sliders.map((_, i) => `<div class="dot ${i===currentSlide?'active':''}"></div>`).join('');
-                currentSlide = (currentSlide + 1) % configData.sliders.length;
-            }
-        }, 4000);
-
-        window.copyRefCode = function() {
-            const code = document.getElementById('ref-code-display').innerText;
-            navigator.clipboard.writeText(code);
-            showToast("📋 Referral Code Copied!");
-        }
-        window.copyRefLink = function() {
-            const link = document.getElementById('ref-link-display').innerText;
-            navigator.clipboard.writeText(link);
-            showToast("📋 Referral Link Copied!");
-        }
-        window.shareTelegram = function() {
-            const link = document.getElementById('ref-link-display').innerText;
-            window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Join BOOMX CLUB and win big!`, '_blank');
-        }
-        window.copyNum = function() {
-            const num = document.getElementById('dep-num').innerText;
-            navigator.clipboard.writeText(num);
-            showToast("📋 Number/ID Copied!");
-        }
     </script>
 
     <script>
         let selectedDepM = 'bkash';
-        let selectedWithM = 'bkash';
+        let selectedAddM = 'bkash'; 
+        let activeCard = null;
+
         function setAmt(val) { document.getElementById('d-amt').value = val; }
         function copyUID() { navigator.clipboard.writeText(document.getElementById('uid-gen').innerText); showToast("📋 UID কপি হয়েছে!"); }
         function switchAuth(t) { document.getElementById('login-view').classList.toggle('hidden', t === 'reg'); document.getElementById('reg-view').classList.toggle('hidden', t === 'login'); document.getElementById('tab-login').classList.toggle('active', t === 'login'); document.getElementById('tab-reg').classList.toggle('active', t === 'reg'); }
@@ -614,45 +639,22 @@
             document.getElementById('dep-symbol').innerText = symbol;
             document.getElementById('dep-limit-label').innerText = `Amount (${symbol}${m==='binance'?'1':'100'} - ${symbol}${m==='binance'?'100':'25,000'})`;
         }
-        
-        function setWithM(m) { 
-            selectedWithM = m; 
-            document.querySelectorAll('#withdraw-page .method-item').forEach(i => i.classList.remove('active')); 
-            document.getElementById('w-'+m).classList.add('active'); 
-            const symbol = m === 'binance' ? "$" : "৳";
-            const limit = m === 'binance' ? "5" : "500";
+
+        function setAddM(m) { 
+            selectedAddM = m; 
+            document.querySelectorAll('#add-card-page .method-item').forEach(i => i.classList.remove('active')); 
+            document.getElementById('ac-'+m).classList.add('active'); 
+        }
+
+        window.selectCard = function(id, method, num) {
+            activeCard = { id, method, num }; // এখানে নম্বরটি সঠিকভাবে স্টোর হচ্ছে
+            document.querySelectorAll('.wallet-card').forEach(c => c.classList.remove('active'));
+            const cardEl = document.getElementById('card-'+id);
+            if(cardEl) cardEl.classList.add('active');
+            const symbol = method === 'binance' ? "$" : "৳";
             document.getElementById('with-symbol').innerText = symbol;
-            document.getElementById('with-limit-label').innerText = `Amount (Min ${symbol}${limit})`;
+            document.getElementById('with-limit-label').innerText = `Amount (Min ${symbol}${method==='binance'?'5':'100'})`;
         }
-
-        const helpBtn = document.getElementById("floating-help");
-        let isDragging = false;
-        helpBtn.addEventListener("touchstart", () => isDragging = true);
-        document.addEventListener("touchmove", (e) => {
-            if (isDragging) {
-                let touch = e.touches[0];
-                helpBtn.style.left = touch.clientX - 30 + "px";
-                helpBtn.style.top = touch.clientY - 30 + "px";
-                helpBtn.style.right = "auto";
-                helpBtn.style.bottom = "auto";
-            }
-        });
-        document.addEventListener("touchend", () => isDragging = false);
-
-        // অটোমেটিক রেফারেল কোড রিড করার ফাংশন
-        function checkReferral() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const refCode = urlParams.get('ref');
-            const refInput = document.getElementById('r-ref');
-            
-            if (refCode && refInput) {
-                refInput.value = refCode; // ইনপুটে কোড বসাবে
-                switchAuth('reg'); // সরাসরি রেজিস্ট্রেশন পেজ ওপেন করবে
-            }
-        }
-
-        // পেজ লোড হওয়ার সাথে সাথে চেক করবে
-        window.addEventListener('DOMContentLoaded', checkReferral);
     </script>
 </body>
 </html>
